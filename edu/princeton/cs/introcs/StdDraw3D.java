@@ -34,16 +34,17 @@ import java.awt.image.*;
 import javax.imageio.ImageIO;
 
 // Java3D libraries.
-import javax.vecmath.*;
-import javax.media.j3d.*;
-import com.sun.j3d.utils.image.*;
-import com.sun.j3d.utils.geometry.*;
-import com.sun.j3d.utils.universe.*;
-import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
-import com.sun.j3d.utils.scenegraph.io.*;
-import com.sun.j3d.loaders.objectfile.ObjectFile;
-import com.sun.j3d.loaders.lw3d.Lw3dLoader;
-import com.sun.j3d.loaders.Loader;
+import org.jogamp.vecmath.*;
+//import javax.media.j3d.*;
+import org.jogamp.java3d.*;
+import org.jogamp.java3d.utils.image.*;
+import org.jogamp.java3d.utils.geometry.*;
+import org.jogamp.java3d.utils.universe.*;
+import org.jogamp.java3d.utils.behaviors.vp.OrbitBehavior;
+import org.jogamp.java3d.utils.scenegraph.io.*;
+import org.jogamp.java3d.loaders.objectfile.ObjectFile;
+//import org.jogamp.java3d.loaders.lw3d.Lw3dLoader;
+import org.jogamp.java3d.loaders.Loader;
  
 /**
  * Standard Draw 3D is a Java library with the express goal of making it
@@ -172,13 +173,13 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     private static Object keyLock = new Object();
 
     // Helper to see when initialization complete
-    private static boolean initialized = false;
+//    private static boolean initialized = false;
     private static boolean fullscreen = false;
     private static boolean immersive = false;
 
     // Pauses the renderer
-    private static boolean showedOnce = true;
-    private static boolean renderedOnce = false;
+//    private static boolean showedOnce = true;
+//    private static boolean renderedOnce = false;
 
     /* Final variables for default values. */
     //-------------------------------------------------------------------------
@@ -238,7 +239,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     // Static initializer.
     static { 
         //System.setProperty("j3d.rend", "ogl");
-        System.setProperty("j3d.audiodevice", "com.sun.j3d.audioengines.javasound.JavaSoundMixer");
+//        System.setProperty("j3d.audiodevice", "com.sun.j3d.audioengines.javasound.JavaSoundMixer");
         setCanvasSize(DEFAULT_SIZE, DEFAULT_SIZE); 
     }
 
@@ -295,7 +296,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         setDefaultLight();
 
         Viewer viewer = universe.getViewer();
-        viewer.createAudioDevice();
+//        viewer.createAudioDevice();
 
         view = viewer.getView();
         view.setTransparencySortingPolicy(View.TRANSPARENCY_SORT_GEOMETRY);
@@ -339,14 +340,15 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         frame.setVisible(true);
         frame.toFront();
         frame.setState(Frame.NORMAL);
-        initialized = true;
+//        initialized = true;
 
     }
 
     /**
      * Adds a Canvas3D to the given Panel p.
      */
-    private static void initializeCanvas () {
+    @SuppressWarnings("serial")
+	private static void initializeCanvas () {
 
         Panel p = new Panel();
 
@@ -419,6 +421,12 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         canvasPanel = p;
 
         //canvas.stopRenderer();
+    }
+    
+    private static Color3f makeColor3f(Color color) {
+    	return new Color3f((float)color.getRed() / 255.0f, 
+    			           (float)color.getGreen() / 255.0f, 
+    			           (float)color.getBlue() / 255.0f);
     }
 
     /**
@@ -777,9 +785,9 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
             ap.setTextureAttributes(texAttr);
         }
 
-        Color3f col = new Color3f(penColor);
+        Color3f col = makeColor3f(penColor);
         Color3f black = new Color3f(0, 0, 0);
-        Color3f specular = new Color3f(GRAY);
+        Color3f specular = makeColor3f(GRAY);
 
         // Material properties
         Material material = new Material(col, black, col, specular, 64);
@@ -834,9 +842,9 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         ap.setLineAttributes(la);
         ap.setPointAttributes(poa);
 
-        Color3f col = new Color3f(penColor);
+        Color3f col = makeColor3f(penColor);
         Color3f black = new Color3f(0, 0, 0);
-        Color3f specular = new Color3f(GRAY);
+        Color3f specular = makeColor3f(GRAY);
 
         // Material properties
         Material material = new Material(col, black, col, specular, 64);
@@ -885,9 +893,9 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     }
 
     /** Converts a Vector3D to a Point3f. */
-    private static Point3f createPoint3f (Vector3D v) {
-        return createPoint3f(v.x, v.y, v.z);
-    }
+//    private static Point3f createPoint3f (Vector3D v) {
+//        return createPoint3f(v.x, v.y, v.z);
+//    }
 
     /** Converts three double scalars to a Point3f. */
     private static Point3f createPoint3f (double x, double y, double z) {
@@ -1723,7 +1731,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
             bgGroup.removeChild(background);
 
             background = createBackground();
-            background.setColor(new Color3f(bgColor));
+            background.setColor(makeColor3f(bgColor));
 
             bgGroup.addChild(background);
             rootGroup.addChild(bgGroup);
@@ -1858,7 +1866,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     }
 
     public static void addFog (Color col, double frontDistance, double backDistance) {
-        LinearFog fog = new LinearFog(new Color3f(col), frontDistance, backDistance);
+        LinearFog fog = new LinearFog(makeColor3f(col), frontDistance, backDistance);
         fog.setInfluencingBounds(INFINITE_BOUNDS);
 
         BranchGroup bg = createBranchGroup();
@@ -1898,7 +1906,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     public static Light directionalLight (double x, double y, double z, Color col) {
 
         DirectionalLight light = new DirectionalLight();
-        light.setColor(new Color3f(col));
+        light.setColor(makeColor3f(col));
 
         light.setInfluencingBounds(INFINITE_BOUNDS);
         light.setCapability(DirectionalLight.ALLOW_STATE_WRITE);
@@ -1921,7 +1929,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
      */
     public static Light ambientLight (Color col) {
 
-        Color3f lightColor = new Color3f(col);
+        Color3f lightColor = makeColor3f(col);
         AmbientLight light = new AmbientLight(lightColor);
 
         light.setInfluencingBounds(INFINITE_BOUNDS);
@@ -1952,7 +1960,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     public static Light pointLight (double x, double y, double z, Color col, double power) {
 
         PointLight light = new PointLight();
-        light.setColor(new Color3f(col));
+        light.setColor(makeColor3f(col));
 
         light.setInfluencingBounds(INFINITE_BOUNDS);
         light.setCapability(PointLight.ALLOW_STATE_WRITE);
@@ -2039,7 +2047,8 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
      * 
      * @param time The number of milliseconds to pause for.
      */
-    public static void pause (int time) {
+    @SuppressWarnings("static-access")
+	public static void pause (int time) {
 
         int t = time;
         int dt = 15;
@@ -2136,9 +2145,9 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
             rootGroup.removeChild(onscreenGroup);
             onscreenGroup = offscreenGroup;
         } else {
-            Enumeration children = offscreenGroup.getAllChildren();
-            while(children.hasMoreElements()) {
-                Node child = (Node)children.nextElement();
+            Iterator<Node> children = offscreenGroup.getAllChildren();
+            while(children.hasNext()) {
+                Node child = children.next();
                 offscreenGroup.removeChild(child);
                 onscreenGroup.addChild(child);
             }
@@ -2340,8 +2349,8 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
 
         Vector3f dimensions = createVector3f(w, h, d);
 
-        com.sun.j3d.utils.geometry.Box box = new 
-            com.sun.j3d.utils.geometry.Box(dimensions.x, dimensions.y, dimensions.z, PRIMFLAGS, ap, numDivisions);
+        org.jogamp.java3d.utils.geometry.Box box = new 
+        		org.jogamp.java3d.utils.geometry.Box(dimensions.x, dimensions.y, dimensions.z, PRIMFLAGS, ap, numDivisions);
         return primitive(box, x, y, z, new Vector3d(xA, yA, zA), null);
     }
 
@@ -2361,8 +2370,8 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
 
         Vector3f dimensions = createVector3f(w, h, d);
 
-        com.sun.j3d.utils.geometry.Box box = new 
-            com.sun.j3d.utils.geometry.Box(dimensions.x, dimensions.y, dimensions.z, PRIMFLAGS, ap, numDivisions);
+        org.jogamp.java3d.utils.geometry.Box box = new 
+        		org.jogamp.java3d.utils.geometry.Box(dimensions.x, dimensions.y, dimensions.z, PRIMFLAGS, ap, numDivisions);
         return primitive(box, x, y, z, new Vector3d(xA, yA, zA), null);
     }
 
@@ -2805,8 +2814,8 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         Line2D.Double line = new Line2D.Double(0, 0, TEXT3D_DEPTH, 0);
         FontExtrusion extrudePath = new FontExtrusion(line);
         Font3D font3D = new Font3D(font, extrudePath);
-        Point3d pos = new Point3d(x, y, z);
-        javax.media.j3d.Text3D t = new javax.media.j3d.Text3D(font3D, text, createPoint3f(x, y, z));
+//        Point3d pos = new Point3d(x, y, z);
+        Text3D t = new Text3D(font3D, text, createPoint3f(x, y, z));
 
         // FIX THIS TO NOT HAVE SCALE INCLUDED
         Transform3D shrinker = new Transform3D();
@@ -2902,25 +2911,25 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         return triangles(points);
     }
 
-    private static Shape drawLWS (String filename) {
-
-        Lw3dLoader loader = new Lw3dLoader();
-        try {
-            BranchGroup bg = loader.load(filename).getSceneGroup();
-            bg.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
-            bg.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
-            bg.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
-            bg.setCapability(BranchGroup.ALLOW_DETACH);
-
-            TransformGroup transGroup = new TransformGroup();
-            transGroup.addChild(bg);
-            BranchGroup bg2 = createBranchGroup();
-            bg2.addChild(transGroup);
-            offscreenGroup.addChild(bg2);
-            return new Shape(bg2, transGroup);
-        } catch (FileNotFoundException fnfe) { fnfe.printStackTrace(); }
-        return null;
-    }
+//    private static Shape drawLWS (String filename) {
+//
+//        Lw3dLoader loader = new Lw3dLoader();
+//        try {
+//            BranchGroup bg = loader.load(filename).getSceneGroup();
+//            bg.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
+//            bg.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
+//            bg.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+//            bg.setCapability(BranchGroup.ALLOW_DETACH);
+//
+//            TransformGroup transGroup = new TransformGroup();
+//            transGroup.addChild(bg);
+//            BranchGroup bg2 = createBranchGroup();
+//            bg2.addChild(transGroup);
+//            offscreenGroup.addChild(bg2);
+//            return new Shape(bg2, transGroup);
+//        } catch (FileNotFoundException fnfe) { fnfe.printStackTrace(); }
+//        return null;
+//    }
 
     private static Shape drawOBJ (String filename, boolean colored, boolean resize) {
 
@@ -3003,7 +3012,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
 
         if (filename == null) return null;
         String suffix = filename.substring(filename.lastIndexOf('.') + 1);
-        String extension = suffix.toLowerCase();
+//        String extension = suffix.toLowerCase();
 
         if (suffix.equals("ply"))
             return drawPLY(filename, colored);
@@ -3037,9 +3046,9 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         return shape(shape, true, null, true);
     }
 
-    private static Shape customWireShape (Shape3D shape) {
-        return shape(shape, false, null, true);
-    }
+//    private static Shape customWireShape (Shape3D shape) {
+//        return shape(shape, false, null, true);
+//    }
 
     /**
      * Draws a Java3D Shape3D object with the given properties.
@@ -3282,7 +3291,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         FontMetrics metrics = graphics.getFontMetrics();
         double xs = scaleX(x);
         double ys = scaleY(y);
-        int ws = metrics.stringWidth(text);
+//        int ws = metrics.stringWidth(text);
         int hs = metrics.getDescent();
         graphics.drawString(text, (float) (xs), (float) (ys + hs));
     }
@@ -3428,7 +3437,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
                 1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         double center = (min + max) / 2;
-        double r  = zoom;
+//        double r  = zoom;
         double b = zoom * 0.1f;
 
         DecimalFormat df = new DecimalFormat(" 0.000;-0.000");
@@ -3485,9 +3494,9 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
 
         BufferedImage buf = createBufferedImage();
         ImageComponent2D imageComp = new ImageComponent2D(ImageComponent.FORMAT_RGB, buf);
-        javax.media.j3d.Raster ras = new javax.media.j3d.Raster(
+        org.jogamp.java3d.Raster ras = new org.jogamp.java3d.Raster(
                 new Point3f(-1.0f,-1.0f,-1.0f), 
-                javax.media.j3d.Raster.RASTER_COLOR, 
+                org.jogamp.java3d.Raster.RASTER_COLOR, 
                 0, 0, 
                 width, height, 
                 imageComp, null);
@@ -3594,7 +3603,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
      */
     public static Shape copy (Shape shape) {
         TransformGroup tg = shape.tg;
-        BranchGroup bg = shape.bg;
+//        BranchGroup bg = shape.bg;
         TransformGroup tg2 = (TransformGroup)tg.cloneTree();
         BranchGroup bg2 = createBranchGroup();
 
@@ -3652,57 +3661,57 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
             return new Vector3D(vec);
         }
 
-        private void rotateQuat (double x, double y, double z, double w) {
-            rotateQuat(new Quat4d(x, y, z, w));
-        }
+//        private void rotateQuat (double x, double y, double z, double w) {
+//            rotateQuat(new Quat4d(x, y, z, w));
+//        }
 
-        private void rotateQuat (Quat4d quat) {
-            Transform3D t = getTransform();
-            
-            Transform3D t1 = new Transform3D();
-            t1.setRotation(quat);
-            t.mul(t1);
-            
-            setTransform(t);
-        }
+//        private void rotateQuat (Quat4d quat) {
+//            Transform3D t = getTransform();
+//            
+//            Transform3D t1 = new Transform3D();
+//            t1.setRotation(quat);
+//            t.mul(t1);
+//            
+//            setTransform(t);
+//        }
 
-        private void setQuaternion (double x, double y, double z, double w) {
-            setQuaternion(new Quat4d(x, y, z, w));
-        }
+//        private void setQuaternion (double x, double y, double z, double w) {
+//            setQuaternion(new Quat4d(x, y, z, w));
+//        }
 
-        private void setQuaternion (Quat4d quat) {
-            Transform3D t = getTransform();
-
-            t.setRotation(quat);
-
-            setTransform(t);
-        }
+//        private void setQuaternion (Quat4d quat) {
+//            Transform3D t = getTransform();
+//
+//            t.setRotation(quat);
+//
+//            setTransform(t);
+//        }
         
-        private Quat4d getQuaternion () {
-            Transform3D t = getTransform();
-            
-            Matrix3d m = new Matrix3d();
-            t.get(m);
-            
-            double w = Math.sqrt(Math.max(0, 1 + m.m00 + m.m11 + m.m22))/2;
-            double x = Math.sqrt(Math.max(0, 1 + m.m00 - m.m11 - m.m22))/2; 
-            double y = Math.sqrt(Math.max(0, 1 - m.m00 + m.m11 - m.m22))/2; 
-            double z = Math.sqrt(Math.max(0, 1 - m.m00 - m.m11 + m.m22))/2; 
-            if (m.m21 - m.m12 < 0) x = -x;
-            if (m.m02 - m.m20 < 0) y = -y;
-            if (m.m10 - m.m01 < 0) z = -z;
-            
-            return new Quat4d(x, y, z, w);
-        }
+//        private Quat4d getQuaternion () {
+//            Transform3D t = getTransform();
+//            
+//            Matrix3d m = new Matrix3d();
+//            t.get(m);
+//            
+//            double w = Math.sqrt(Math.max(0, 1 + m.m00 + m.m11 + m.m22))/2;
+//            double x = Math.sqrt(Math.max(0, 1 + m.m00 - m.m11 - m.m22))/2; 
+//            double y = Math.sqrt(Math.max(0, 1 - m.m00 + m.m11 - m.m22))/2; 
+//            double z = Math.sqrt(Math.max(0, 1 - m.m00 - m.m11 + m.m22))/2; 
+//            if (m.m21 - m.m12 < 0) x = -x;
+//            if (m.m02 - m.m20 < 0) y = -y;
+//            if (m.m10 - m.m01 < 0) z = -z;
+//            
+//            return new Quat4d(x, y, z, w);
+//        }
 
-        private void orientAxis (Vector3D axis, double angle) {
-            Transform3D t = getTransform();
-
-            AxisAngle4d aa = new AxisAngle4d(axis.x, axis.y, axis.z, Math.toRadians(angle));
-            t.setRotation(aa);
-
-            setTransform(t);
-        }
+//        private void orientAxis (Vector3D axis, double angle) {
+//            Transform3D t = getTransform();
+//
+//            AxisAngle4d aa = new AxisAngle4d(axis.x, axis.y, axis.z, Math.toRadians(angle));
+//            t.setRotation(aa);
+//
+//            setTransform(t);
+//        }
         
         public void rotateAxis (Vector3D axis, double angle) {
             if(angle == 0) return;
@@ -3970,12 +3979,12 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     */
     public static class Camera extends Transformable {
         
-        private TransformGroup tg;
+//        private TransformGroup tg;
         private Shape pair;
 
         private Camera (TransformGroup tg) {
             super(tg);
-            this.tg = tg;
+//            this.tg = tg;
         }
 
         public void match (Shape s) {
@@ -4100,8 +4109,8 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
 
         private void setColor (Appearance ap, Color c) {
             Material m = ap.getMaterial();
-            m.setAmbientColor(new Color3f(c));
-            m.setDiffuseColor(new Color3f(c));
+            m.setAmbientColor(makeColor3f(c));
+            m.setDiffuseColor(makeColor3f(c));
 
             float alpha = ((float)c.getAlpha()) / 255;
             if (alpha < 1.0) {
@@ -4120,10 +4129,10 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
     */
     public static class Light extends Transformable {
 
-        javax.media.j3d.Light light;
+    	org.jogamp.java3d.Light light;
         BranchGroup bg;
 
-        private Light (BranchGroup bg, TransformGroup tg, javax.media.j3d.Light light) {
+        private Light (BranchGroup bg, TransformGroup tg, org.jogamp.java3d.Light light) {
             super(tg);
             this.light = light;
             this.bg = bg;
@@ -4146,7 +4155,7 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
         }
 
         public void setColor (Color col) {
-            light.setColor(new Color3f(col));
+            light.setColor(makeColor3f(col));
         }
 
         public void scalePower (double power) {
@@ -4260,13 +4269,13 @@ KeyListener, ActionListener, ChangeListener, ComponentListener, WindowFocusListe
 
         //--------------------------------------------------------------------------
 
-        private Vector3D (Point3f p) {
-
-            this.x = p.x;
-            this.y = p.y;
-            this.z = p.z;
-
-        }
+//        private Vector3D (Point3f p) {
+//
+//            this.x = p.x;
+//            this.y = p.y;
+//            this.z = p.z;
+//
+//        }
 
         //--------------------------------------------------------------------------
         /*
